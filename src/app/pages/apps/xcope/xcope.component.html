@@ -1,0 +1,290 @@
+<div class="h-full flex flex-col">
+  <canvas class="canvas" #canvas width="100" height="100"
+    [style.display]="hide_canvas == 'HIDE CANVAS' ? 'block' : 'none'"></canvas>
+  <canvas class="canvas-background" #canvas_background
+    [style.display]="hide_image == 'HIDE IMAGE' && !show_map ? 'block' : 'none'"></canvas>
+  <img #background src="../../../../assets/img/background.jpg" alt="background"
+    style="display: none; width: 100%; height: 100%;">
+  <agm-map #map [latitude]="lat" [longitude]="lng" [style.display]="show_map ? 'block' : 'none'"
+    [ngStyle]="{'z-index': map_zIndex ? 10 : 2}" [zoom]="17"></agm-map>
+
+  <button mat-raised-button class="hide-image" color="accent"
+    (click)="hide_image = hide_image == 'HIDE IMAGE' ? 'SHOW IMAGE' : 'HIDE IMAGE'">{{hide_image}}</button>
+  <button mat-raised-button class="hide-canvas" color="accent"
+    (click)="hide_canvas = hide_canvas == 'HIDE CANVAS' ? 'SHOW CANVAS' : 'HIDE CANVAS'">{{hide_canvas}}</button>
+
+  <div class="custom-navbar">
+    <a href="#" style="float: left; color: white"><span
+        style="font-size: 18px; font-weight: bold;">&nbsp;&nbsp;Xcope</span><br>&nbsp;&nbsp;Estimating Software
+      Calculation</a>
+    <button mat-button [matMenuTriggerFor]="menu" style="float: right;"><img
+        src="../../../../assets/img/icons/settings.ico" alt="settings" (click)="openTool('settings')"></button>
+    <mat-select name="unit" [(value)]="selected_unit">
+      <mat-option value="cm">centimeters</mat-option>
+      <mat-option value="in">inches</mat-option>
+      <mat-option value="m">meters</mat-option>
+      <mat-option value="km">kilometers</mat-option>
+    </mat-select>
+
+    <input type="text" class="scale-text" value="{{scale_factor}}" style="font-size: 18px;">
+    <span class="scale-span">1 : </span>
+
+    <img class="arrow-image" src="../../../../assets/img/icons/up.ico" alt="arrow up"
+      (click)="scale_factor=scale_factor+1">
+    <img class="arrow-image" src="../../../../assets/img/icons/down.ico" alt="arrow down"
+      (click)="scale_factor = scale_factor == 1 ? 1 : scale_factor - 1">
+    <h3 style="float: right; color: white; padding-top: 5px;">Scale&nbsp;&nbsp;</h3>
+  </div>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="openTool('clear_canvas')">Clear Canvas</button>
+    <button mat-menu-item (click)="openTool('save')">Save</button>
+    <button mat-menu-item (click)="openTool('export')">Export</button>
+    <button mat-menu-item (click)="openTool('print')">Print</button>
+    <button mat-menu-item (click)="file_dialog.click()">Import</button>
+    <input type="file" #file_dialog style="display: none" (change)="openTool('import', $event)">
+    <button mat-menu-item (click)="show_map=!show_map && map_zIndex = true">Show Map</button>
+  </mat-menu>
+
+  <mat-card class="main-tool">
+    <mat-card-content #main_tool_card class="d-flex flex-column">
+      <img src="../../../../assets/img/icons/line_tool.png" #line_tool alt="line_tool" (click)="openTool('line_tool')"
+        class="p-1 mb-3" matTooltip="line" matTooltipPosition="left" matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/magic_wand.png" #magic_wand_tool alt="magic_wand"
+        (click)="openTool('magic_wand_tool')" class="p-1 mb-3" matTooltip="magic wand" matTooltipPosition="left"
+        matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/pen.png" #pen_tool alt="pen" (click)="openTool('pen')" class="p-1 mb-3"
+        matTooltip="pen" matTooltipPosition="left" matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/zoom_in.png" #zoom_in_tool alt="zoom_in" (click)="openTool('zoom_in')"
+        class="p-1 mb-3" matTooltip="zoom in" matTooltipPosition="left" matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/zoom_out.png" #zoom_out_tool alt="zoom_out" (click)="openTool('zoom_out')"
+        class="p-1 mb-3" matTooltip="zoom out" matTooltipPosition="left" matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/hand.png" #hand_tool alt="hand" (click)="openTool('hand')" class="p-1 mb-3"
+        matTooltip="hand" matTooltipPosition="left" matTooltipClass="tooltip">
+      <img src="../../../../assets/img/icons/undo.png" #undo_tool alt="undo" (click)="openTool('undo')" class="p-1 mb-3"
+        matTooltip="undo" matTooltipPosition="left" matTooltipClass="tooltip">
+    </mat-card-content>
+  </mat-card>
+  <div class="arrow-1" [style.display]="line_tool_card_display ? 'block' : 'none'"></div>
+  <div class="arrow-2" [style.display]="magic_wand_tool_card_display ? 'block' : 'none'"></div>
+
+  <mat-card class="line-tool" #line_tool_card [style.display]="line_tool_card_display ? 'block' : 'none'">
+    <mat-card-content>
+      <img src="../../../../assets/img/icons/line_tool.png" #line_tool_line alt="line_tool" (click)="openTool('line')"
+        class="p-1 mb-3" matTooltip="line tool" matTooltipPosition="left" matTooltipClass="tooltip" />
+      <img src="../../../../assets/img/icons/rectangle.png" #line_tool_rectangle alt="rectangle"
+        (click)="openTool('rectangle')" class="p-1 mb-3" matTooltip="rectangle tool" matTooltipPosition="left"
+        matTooltipClass="tooltip" />
+      <img src="../../../../assets/img/icons/circle.png" #line_tool_circle alt="circle" (click)="openTool('circle')"
+        class="p-1 mb-3" matTooltip="circle tool" matTooltipPosition="left" matTooltipClass="tooltip" />
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="magic-wand-tool" #magic_wand_tool_card
+    [style.display]="magic_wand_tool_card_display ? 'block' : 'none'">
+    <mat-card-content>
+      <img src="../../../../assets/img/icons/magic_wand.png" #magic_wand_tool_magic alt="magic_wand_tool"
+        (click)="openTool('magic_wand')" class="p-1 mb-3" matTooltip="magic wand tool" matTooltipPosition="left"
+        matTooltipClass="tooltip" />
+    </mat-card-content>
+  </mat-card>
+
+  <ul class="area-panel">
+    <li class="area-plus" (click)="openTool('plus')">
+      <span class="area-plus-icon">+</span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)"><span class="area-index-index">1</span></li>
+    <li class="area-info-index" [style.display]="selected_area == 1 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[0]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[0]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 1 ? 'block' : 'none'">
+      <span class="area-index-index">2</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 1 && selected_area == 2 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[1]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[1]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 2 ? 'block' : 'none'">
+      <span class="area-index-index">3</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 2 && selected_area == 3 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[2]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[2]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 3 ? 'block' : 'none'">
+      <span class="area-index-index">4</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 3 && selected_area == 4 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[3]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[3]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 4 ? 'block' : 'none'">
+      <span class="area-index-index">5</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 4 && selected_area == 5 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[4]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[4]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 5 ? 'block' : 'none'">
+      <span class="area-index-index">6</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 5 && selected_area == 6 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[5]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[5]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 6 ? 'block' : 'none'">
+      <span class="area-index-index">7</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 6 && selected_area == 7 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[6]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[6]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 7 ? 'block' : 'none'">
+      <span class="area-index-index">8</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 7 && selected_area == 8 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[7]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[7]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 8 ? 'block' : 'none'">
+      <span class="area-index-index">9</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 8 && selected_area == 9 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[8]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[8]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+    <li class="area-index" (click)="openTool('area_plus', $event)" [style.display]="area_length > 9 ? 'block' : 'none'">
+      <span class="area-index-index">10</span>
+    </li>
+    <li class="area-info-index" [style.display]="area_length > 9 && selected_area == 10 ? 'block' : 'none'">
+      <svg class="bi bi-square" width="16px" height="16px" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <path fill-rule="evenodd"
+          d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+      </svg>
+      <span class="area-perimeter-index">{{perimeter_list[9]}} {{selected_unit}}</span>
+      <svg class="bi bi-square-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="white"
+        xmlns="http://www.w3.org/2000/svg" style="display: inline;">
+        <rect width="16" height="16" rx="2" />
+      </svg>
+      <span class="area-area-index" (click)="area_details_show=!area_details_show">{{area_list[9]}}
+        {{selected_unit}}<sup>2</sup></span>
+    </li>
+  </ul>
+  <mat-card class="area-details" [style.display]="area_details_show ? 'block' : 'none'">
+    <small style="font-weight: bold;">nm<sup>2</sup>&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index + 14}}</sup></small><br>
+    <small style="font-weight: bold;">mm<sup>2</sup>&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index + 2}}</sup></small><br>
+    <small style="font-weight: bold;">cm<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index}}</sup></small><br>
+    <small style="font-weight: bold;">m<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index - 4}}</sup></small><br>
+    <small style="font-weight: bold;">km<sup>2</sup>&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index - 10}}</sup></small><br>
+    <small style="font-weight: bold;">in<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      {{(current_area * 1.55).toFixed(2)}} *
+      10<sup>{{square_index - 1}}</sup></small><br>
+    <small style="font-weight: bold;">ft<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      {{(current_area * 1.076).toFixed(2)}} *
+      10<sup>{{square_index - 3}}</sup></small><br>
+    <small style="font-weight: bold;">yd<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp; {{(current_area * 1.196).toFixed(2)}} *
+      10<sup>{{square_index - 4}}</sup></small><br>
+    <small style="font-weight: bold;">mi<sup>2</sup>&nbsp;&nbsp;&nbsp;&nbsp; {{(current_area * 3.861).toFixed(2)}} *
+      10<sup>{{square_index - 11}}</sup></small><br>
+    <small style="font-weight: bold;">a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index - 7}}</sup></small><br>
+    <small style="font-weight: bold;">ha&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{current_area}} *
+      10<sup>{{square_index - 8}}</sup></small>
+  </mat-card>
+</div>
